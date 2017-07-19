@@ -1,10 +1,10 @@
 $(document).ready(function() {
 	// Create the canvas
-	var canvas = document.createElement("canvas");
-	var ctx = canvas.getContext("2d");
+	var canvas = document.createElement('canvas');
+	var ctx = canvas.getContext('2d');
 	canvas.width = 700;
 	canvas.height = 500;
-	document.body.appendChild(canvas);
+	$('#game').append(canvas);
 	
 	var img_bg = new Image();
 	var img_chara = new Image();
@@ -20,9 +20,9 @@ $(document).ready(function() {
 	};
 	
 	var plate = {
-		x: chara.x-32,
-		y: chara.y+64,
-		width: 96
+		x: chara.x-45,
+		y: chara.y+72,
+		width: 80
 	};
 	
 	var falling = {
@@ -41,7 +41,7 @@ $(document).ready(function() {
 	img_chara.onload = function() {
     ctx.drawImage(img_chara, chara.x , chara.y);
 	};
-	img_chara.src = 'img/char.png';
+	img_chara.src = 'img/goro.png';
 	
 	img_plate.onload = function() {
     ctx.drawImage(img_plate, plate.x, plate.y );
@@ -63,15 +63,26 @@ $(document).ready(function() {
 		delete keysDown[e.keyCode];
 	}, false);
 	
+	var isPaused = false;
+	$("#game").click(function() {
+		isPaused = !isPaused;
+	});
+	
 	var pcList={};
 	var pcImg = [];
 	var pcNum = 0;
-	var caught=true;
+	var caught=false;
+	var pcMax = 10;
+	var pcCaught = 0;
+	var missed = 0;
+	var missedMax = 3;
+	var level = 1;
+	var score = 0;
 	
 	var xstart = 300;
 	var pcSpeed = 150;
 	var newPancake = function() {
-		falling.x = xstart;
+		falling.x = Math.floor(Math.random() * (canvas.width - falling.width-20));
 		falling.y=0;
 		falling.speed = pcSpeed;
 		caught = false;
@@ -80,12 +91,14 @@ $(document).ready(function() {
 	// Update game objects
 	var onEdge = false;
 	var update = function (modifier) {
+		$(".popup").toggle(false);
+		
 		if (37 in keysDown) { // Player holding left
 			chara.x -= chara.speed * modifier;
 			plate.x -= chara.speed * modifier;
 			if (plate.x < 0) {
 				plate.x=0;
-				chara.x=32;
+				chara.x=45;
 				onEdge = true;
 			}
 			else {onEdge = false;}
@@ -100,7 +113,7 @@ $(document).ready(function() {
 			chara.x += chara.speed * modifier;
 			plate.x += chara.speed * modifier;
 			if (chara.x + chara.width >= canvas.width) {
-				plate.x=canvas.width - chara.width - 32;
+				plate.x=canvas.width - chara.width - 45;
 				chara.x=canvas.width - chara.width;
 				onEdge = true;
 			}
@@ -117,7 +130,7 @@ $(document).ready(function() {
 		var plateRight = plate.x + plate.width;
 		var fallLeft = falling.x;
 		var fallRight = falling.x + falling.width;
-		if (plate.y <= falling.y + falling.height && ( (plateRight >= fallRight && plateLeft < fallRight) || (plateRight >= fallLeft && plateLeft < fallLeft) )) {
+		if (plate.y +3 <= falling.y + falling.height && ( (plateRight >= fallRight && plateLeft < fallRight) || (plateRight >= fallLeft && plateLeft < fallLeft) )) {
 			falling.speed=0;
 			pcList[pcNum] = {x: falling.x, y: falling.y};
 			caught = true;
@@ -135,15 +148,57 @@ $(document).ready(function() {
 				break;
 			}
 		}
+		
+		//pancake on ground
+		if (falling.y > canvas.width) {
+			newPancake();
+			missed++;
+		}
+		
+		//game over
+		if (missed >= missedMax) {
+			isPaused = true;
+			$("#gameover").toggle();
+		}
 
 		
 		if(caught==false) {
 			falling.y += falling.speed * modifier;
 		}
 		else {
-			newPancake();
+			pcCaught++;
+			score += pcSpeed;
+			if (pcCaught < pcMax) {
+				newPancake();
+			}
+			else {
+				level++;
+				pcSpeed += 50;
+				isPaused = true;
+				newLevel();
+				newPancake();
+			}
+			//updateStats();
 		}
+		
+		updateStats();
 
+	};
+	
+	var newLevel = function() {
+		pcCaught = 0;
+		pcNum = 0;
+		pcList = {};
+		$("#newlevel").toggle();
+	};
+	
+	var updateStats = function() {
+		$("#lv").html(level);
+		$("#caught").html(pcCaught);
+		$("#max").html(pcMax);
+		$("#missed").html(missed);
+		$("#missmax").html(missedMax);
+		$("#score").html(score);
 	};
 	
 	var render = function () {
@@ -160,9 +215,11 @@ $(document).ready(function() {
 		var now = Date.now();
 		var delta = now - then;
 
-		update(delta / 1000);
+		if(!isPaused) {
+			update(delta / 1000);
 		render();
-
+		}
+		
 		then = now;
 
 		// Request to do this again ASAP

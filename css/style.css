@@ -1,0 +1,14 @@
+#stats {
+	position: fixed;
+	left: 720px;
+	top: 20px;
+	text-align: center
+}
+
+.popup {
+	display: none;
+	position: fixed;
+	background-color: #fff;
+	left: 300px;
+	top: 200px;
+}
