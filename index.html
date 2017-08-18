@@ -8,6 +8,7 @@
 		<link rel="stylesheet" href="css/style.css">
 		<script src="js/jquery-3.1.0.js"></script>
 		<script src="js/script.js"></script>
+		<script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
 	</head>
 	
 	<body>
@@ -19,18 +20,38 @@
 			Caught: <span id="caught">0</span>/ <span id="max">20</span> <br>
 			Missed: <span id="missed">0</span>/ <span id="missmax">3</span> <br><br>
 			<h3>Score: <span id="score">0</span></h3> <br><br>
-			Use arrow keys to move; click to start/pause and unpause!
+			
+			Click in the game field or press space to start or pause/unpause!<br><br>
+			<a href="#" onclick="showHowto()">How to play</a> <br>
 		</div>
 		<br><br>
 		
 		<div id="gameover" class="popup">
 		Game over! <br>
-		(you gotta refresh the page for now)
+		<b>Final score: <span id="finalscore">0</span></b><br><br>
+		<div id="tweetbtn"></div>
+		<br><button onclick="resetGame()">Play again?</button>
 		</div>
 		
 		<div id="newlevel" class="popup">
-		Level complete! <br>
-		Click to continue
+		Level complete! <br><br>
+		Height bonus: <span id="heightbonus">0</span><br>
+		Neatness bonus: <span id="neatbonus">0</span><br><br>
+		
+		Click or press space to continue
+		</div>
+		
+		<div id="howto" class="popup">
+		How to play:<br>
+		<ul>
+		<li>Move Akechi using the left/right arrow keys</li>
+		<li>Catch pancakes by having them touch the plate or any pancake on it</li>
+		<li>Try to stack them high and neat for bonus points!
+		<li>Catch 10 pancakes to advance to the next level and increase the speed</li>
+		<li>Miss 3 pancakes and it's game over!</li>
+		</ul>
+		<br>
+		Click or press space to close and start
 		</div>
 		
 	</body>
