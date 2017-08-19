@@ -12,6 +12,7 @@ var xstart = 300;
 var pcSpeed = 150;
 
 var isPaused = true;
+var gameOver = false;
 
 var falling = {
 	speed: 150,
@@ -37,7 +38,7 @@ $(document).ready(function() {
 	
 	
 	var chara = {
-		speed: 300,
+		speed: 350,
 		x: canvas.width/2,
 		y: canvas.height-128,
 		width: 96
@@ -186,6 +187,7 @@ $(document).ready(function() {
 		//game over
 		if (missed >= missedMax) {
 			isPaused = true;
+			gameOver = true;
 			$("#finalscore").html(score);
 			var tweettext = "I scored " + score + " in Akechi's Pancake Panic!";
 			
@@ -287,9 +289,11 @@ $(document).ready(function() {
 		var now = Date.now();
 		var delta = now - then;
 
-		if(!isPaused) {
-			update(delta / 1000);
-		render();
+		if(!gameOver) {
+			if(!isPaused) {
+				update(delta / 1000);
+				render();
+			}
 		}
 		
 		then = now;
@@ -321,6 +325,7 @@ var resetGame = function() {
 	
 	$("#gameover").toggle();
 	isPaused = false;
+	gameOver = false;
 
 };
 
